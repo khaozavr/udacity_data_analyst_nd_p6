@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="style_final.css">
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+	</head>
+	<body>
+		<h1 align="center">Flights with over 15 min departure delay, 2008</h1>
+		<h2 align="center"><i>% of all US inbound flights per day</i></h2>
+		<h3 align="center"><i>(hover over the days to get percentage numbers)</i></h2>
+		<div id="calendar"></div>
+		<script type="text/javascript" src="calendarize_final.js"></script>
+		<script type="text/javascript">
+			var $calendar = document.getElementById("calendar");
+			var currentYear = "2008";
+			var calendarize = new Calendarize();
+			calendarize.buildYearCalendar($calendar, currentYear);
+
+			// load delay data
+			d3.csv("delays2008.csv", function(d) { return d; },
+					plot_delays);
+
+			// create a div for tooltip
+			var div = d3.select("body").append("div")
+		    .attr("class", "tooltip")
+		    .style("opacity", 0);
+
+			// plot delays as day background colors
+			function plot_delays(data) {
+				d3.selectAll(".day")
+					.data(data)
+					.style("background-color", function (d) {
+						if (d["PercentDelayed"] < 5) { return "FDE3E3";}
+						if (d["PercentDelayed"] >= 5 && d["PercentDelayed"] < 10) { return "FDE3E3";}
+						if (d["PercentDelayed"] >= 10 && d["PercentDelayed"] < 15) { return "F3CDCA";}
+						if (d["PercentDelayed"] >= 15 && d["PercentDelayed"] < 20) { return "EAB7B2";}
+						if (d["PercentDelayed"] >= 20 && d["PercentDelayed"] < 25) { return "E1A29A";}
+						if (d["PercentDelayed"] >= 25 && d["PercentDelayed"] < 30) { return "D88C81";}
+						if (d["PercentDelayed"] >= 30 && d["PercentDelayed"] < 35) { return "CE7669";}
+						if (d["PercentDelayed"] >= 35 && d["PercentDelayed"] < 40) { return "C56151";}
+						if (d["PercentDelayed"] >= 40 && d["PercentDelayed"] < 45) { return "BC4B38";}
+						if (d["PercentDelayed"] >= 45 && d["PercentDelayed"] < 50) { return "B33520";}
+						if (d["PercentDelayed"] >= 50) { return "AA2008";}
+					})
+					.text(function(d) {
+						return d3.select(this).attr("data-day")})
+					.on("mouseover", function(d) {
+						// d3.select(this).text(function(d) {
+						// 	return d3.select(this).attr("data-day")})
+						div .transition()
+                .duration(200)
+                .style("opacity", .9);
+            div	.html(d.PercentDelayed + " %")
+                .style("left", (d3.event.pageX / 0.67 + 20) + "px")
+                .style("top", (d3.event.pageY / 0.67 - 30) + "px")
+								.style("font-size", "20px");
+            })
+        	.on("mouseout", function(d) {
+						//d3.select(this).text("")
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+			}
+		</script>
+	</body>
+</html>
